@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Perfil - WMEFL Crypto{% endblock %}
+{% block content %}
+<div class="card auth-card">
+  <h1>Perfil</h1>
+  <p><strong>Nome:</strong> {{ user.name }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Saldo:</strong> R$ {{ "%.2f"|format(user.balance) }}</p>
+
+  <!-- Caixa de aviso de saque -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        {% if "saque" in msg.lower() %}
+        <div class="alert alert-warning" style="background:#2a2a2a; border-left:5px solid #ff3333; padding:15px; margin:15px 0; border-radius:8px; color:#fff;">
+          <strong>Solicitação de Saque Recebida ✅</strong><br>
+          {{ msg }}<br>
+          Seu saque está em <b>análise</b> e será processado em até <b>1h a 3h</b>.
+        </div>
+        {% else %}
+          <div class="alert {{ category }}">{{ msg }}</div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Formulário para atualizar PIX/telefone/titular -->
+  <form method="post" style="margin-bottom:18px;">
+    <h3>Dados para Recebimento (PIX)</h3>
+    <label>Chave PIX (email/CNPJ/CPF/EVP)</label><br>
+    <input type="text" name="pix_key" value="{{ user.pix_key or '' }}" placeholder="sua_chave@exemplo.com" style="width:100%;padding:8px;margin:6px 0;border-radius:6px;border:1px solid rgba(255,255,255,0.06)">
+
+    <label>Nome do Titular</label><br>
+    <input type="text" name="pix_holder" value="{{ user.pix_holder or '' }}" placeholder="Nome completo" style="width:100%;padding:8px;margin:6px 0;border-radius:6px;border:1px solid rgba(255,255,255,0.06)">
+
+    <label>Telefone</label><br>
+    <input type="text" name="phone" value="{{ user.phone or '' }}" placeholder="+55 11 9xxxx-xxxx" style="width:100%;padding:8px;margin:6px 0;border-radius:6px;border:1px solid rgba(255,255,255,0.06)">
+
+    <div style="margin-top:10px;">
+      <button class="btn btn-primary" type="submit">Salvar Dados PIX</button>
+    </div>
+  </form>
+
+  <!-- Botões de ação: depósito e saque -->
+  <div style="margin: 12px 0; display:flex; gap:12px; align-items:center;">
+    <a href="{{ url_for('deposito') }}" class="btn btn-success">💰 Fazer Depósito</a>
+
+    <form action="{{ url_for('wallet_withdraw') }}" method="post" style="display:flex; gap:8px; align-items:center;">
+      <input type="number" name="amount" step="0.01" min="0" placeholder="Valor para saque" required style="padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06)">
+      <button type="submit" class="btn btn-danger">⬇️ Solicitar Saque</button>
+    </form>
+  </div>
+
+  <h2>Últimas transações</h2>
+  {% if txs %}
+    <ul>
+      {% for tx in txs %}
+        <li>
+          {{ tx.type }} de R$ {{ "%.2f"|format(tx.amount) }}
+          - {{ tx.status }}
+          - {{ tx.created_at.strftime("%d/%m/%Y %H:%M") }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Você ainda não possui transações.</p>
+  {% endif %}
+</div>
+{% endblock %}

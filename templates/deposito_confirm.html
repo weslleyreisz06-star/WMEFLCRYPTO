@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Confirmação de Depósito{% endblock %}
+
+{% block content %}
+<div class="deposit-confirm-container" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:80vh; background:#1E1E2F; color:#FFF; padding:50px; border-radius:20px; box-shadow:0 0 30px rgba(0,0,0,0.5);">
+    <h2 style="color:#FF5A5F; margin-bottom:20px;">Confirmação de Depósito</h2>
+    <p>Você solicitou um depósito de <strong style="color:#FFD700;">R$ {{ amount }}</strong></p>
+
+    <div style="margin:30px 0; text-align:center;">
+        <h4 style="color:#FFD700;">Escaneie este QR Code para pagar:</h4>
+        <div style="background:#2A2A3C; padding:15px; border-radius:15px; display:inline-block;">
+            <img src="data:image/png;base64,{{ qr_img }}" alt="QR Code PIX" style="width:260px; height:260px; border-radius:15px; box-shadow:0 0 20px #FF5A5F;">
+        </div>
+        <p style="margin-top:15px;">Chave PIX: <strong style="color:#FF5A5F;">{{ pix_key }}</strong>
+            <button onclick="copyPix()" style="padding:5px 12px; border:none; border-radius:8px; background:#FFD700; color:#1E1E2F; cursor:pointer; font-weight:bold;">Copiar</button>
+        </p>
+        <p style="margin-top:10px; font-size:14px; color:#AAA;">Payload PIX: <code style="color:#FFD700;">{{ payload }}</code></p>
+    </div>
+
+    <a href="{{ url_for('dashboard') }}" style="padding:12px 25px; background:#FF5A5F; border:none; border-radius:12px; color:#FFF; font-weight:bold; text-decoration:none; transition:0.3s; cursor:pointer;">Voltar ao Dashboard</a>
+</div>
+
+<script>
+function copyPix() {
+    navigator.clipboard.writeText("{{ pix_key }}").then(() => {
+        alert("Chave PIX copiada!");
+    }).catch(err => {
+        alert("Erro ao copiar a chave PIX");
+    });
+}
+</script>
+{% endblock %}

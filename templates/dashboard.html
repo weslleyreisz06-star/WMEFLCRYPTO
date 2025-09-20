@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-root">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="card profile-card">
+      <div class="profile-top">
+        <div class="avatar">
+          {{ (current_user.name or current_user.email)[0]|upper }}
+        </div>
+        <div class="profile-info">
+          <div class="profile-name">{{ current_user.name or current_user.email }}</div>
+          <div class="profile-meta">Membro desde: {{ current_user.created_at.strftime('%d/%m/%Y') if current_user.created_at else '—' }}</div>
+        </div>
+        {% if current_user.is_admin %}
+        <div class="admin-badge">ADMIN</div>
+        {% endif %}
+      </div>
+
+      <div class="balance-block">
+        <div class="label">Saldo</div>
+        <div class="balance-value" id="balance">R$ {{ "%.2f"|format(current_user.balance) }}</div>
+      </div>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="{{ url_for('profile') }}">💼 Gerenciar Carteira</a>
+        {% if current_user.is_admin %}
+        <a class="btn btn-secondary" href="{{ url_for('admin_index') }}">⚙️ Painel Admin</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shortcuts">
+      <strong>Atalhos</strong>
+      <ul>
+        <li><a href="{{ url_for('dashboard') }}">🏠 Visão Geral</a></li>
+        <li><a href="{{ url_for('profile') }}">👤 Perfil</a></li>
+        <li><a href="{{ url_for('logout') }}">🚪 Sair</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="card market-card">
+      <div class="market-header">
+        <div><strong>Mercado — Atualizações em Tempo Real</strong></div>
+        <div class="source">Fonte: CoinGecko</div>
+      </div>
+
+      <div id="market-cards" class="market-grid">
+        {% for cid, sym in coins.items() %}
+        <div class="coin-card" id="card-{{ cid }}" data-price="{{ prices.get(cid, 0.0) }}">
+          <div class="coin-title">{{ sym }}</div>
+          <div class="coin-price">R$ <span class="price">{{ "%.2f"|format(prices.get(cid, 0.0)) }}</span></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Espaço para outras seções futuras -->
+    <div class="card info-card">
+      <strong>Últimas transações</strong>
+      <div class="muted">Aqui virão suas transações recentes (se houver).</div>
+    </div>
+  </main>
+</div>
+
+<footer class="page-footer">
+  Todos os Direitos Reservados Group WMEFL
+</footer>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+/* Reset parcial compatível com register.html visual */
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#0f0f15; color:#fff; margin:0; }
+
+/* Container principal - similar em proporção ao register (não centralizado mas proporcional) */
+.dashboard-root{
+  max-width:1100px;
+  margin:18px auto;
+  padding:0 16px 40px;
+  display:flex;
+  gap:20px;
+  align-items:flex-start;
+  flex-wrap:wrap; /* importante para mobile */
+  box-sizing:border-box;
+}
+
+/* SIDEBAR */
+.sidebar {
+  flex: 0 0 320px; /* largura fixa para desktop */
+  min-width: 260px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+/* MAIN */
+.main {
+  flex:1 1 0;
+  min-width: 280px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+/* Card base (consistente com register) */
+.card {
+  background:#1e1e28;
+  padding:18px;
+  border-radius:12px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.45);
+  color:#ffffff;
+}
+
+/* PROFILE CARD */
+.profile-top {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.avatar {
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#00b4ff,#0066ff);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:20px;
+  color:#fff;
+}
+
+.profile-name { font-weight:700; font-size:16px; color:#e6f7ff; }
+.profile-meta { font-size:13px; color:#bfc9d9; }
+
+.admin-badge {
+  margin-left:auto;
+  background:#ff3476;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+  color:#fff;
+}
+
+/* BALANCE */
+.balance-block { margin:6px 0 12px; }
+.label { font-size:13px; color:#c7d2e0; }
+.balance-value { font-size:22px; font-weight:800; color:#00ff9d; margin-top:6px; }
+
+/* ACTIONS */
+.actions { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.btn { display:inline-block; text-decoration:none; text-align:center; padding:10px 12px; border-radius:10px; font-weight:700; }
+.btn-primary { background:#00ff9d; color:#000; }
+.btn-primary:hover { background:#00cc7a; }
+.btn-secondary { background:#2b2b3a; color:#fff; border:1px solid rgba(255,255,255,0.04); }
+.btn-secondary:hover { background:#33333f; }
+
+/* SHORTCUTS */
+.shortcuts ul { list-style:none; padding:0; margin:8px 0 0 0; }
+.shortcuts li { margin:8px 0; }
+.shortcuts a { color:#00b4ff; text-decoration:none; font-weight:600; }
+.shortcuts a:hover { color:#65d1ff; }
+
+/* MARKET GRID */
+.market-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.source { color:#aeb7c8; font-size:13px; }
+
+.market-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap:12px;
+}
+
+/* EACH COIN CARD */
+.coin-card {
+  background: linear-gradient(180deg, #212132 0%, #1a1a2a 100%);
+  border-radius:10px;
+  padding:12px;
+  text-align:center;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s;
+  border:1px solid rgba(255,255,255,0.03);
+}
+
+.coin-card:hover { transform: translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.45); }
+
+.coin-title { font-weight:700; margin-bottom:8px; color:#e6eefc; }
+.coin-price { font-weight:800; color:#00ff9d; font-size:18px; }
+
+/* animation classes for price change */
+.price-up { animation: flash-up 900ms ease; }
+.price-down { animation: flash-down 900ms ease; }
+
+@keyframes flash-up {
+  0% { box-shadow: 0 0 0 rgba(0,255,157,0.0); }
+  20% { box-shadow: 0 0 12px rgba(0,255,157,0.18); }
+  100% { box-shadow: 0 0 0 rgba(0,255,157,0.0); }
+}
+@keyframes flash-down {
+  0% { box-shadow: 0 0 0 rgba(255,80,80,0.0); }
+  20% { box-shadow: 0 0 12px rgba(255,80,80,0.14); }
+  100% { box-shadow: 0 0 0 rgba(255,80,80,0.0); }
+}
+
+/* INFO CARD */
+.info-card .muted { color:#bfc9d9; margin-top:8px; }
+
+/* FOOTER */
+.page-footer {
+  max-width:1100px;
+  margin:16px auto;
+  padding:12px 16px;
+  text-align:center;
+  color:#9da7b8;
+  font-size:14px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 880px) {
+  .dashboard-root { padding:12px; }
+  .sidebar { flex:1 1 100%; order:1; }
+  .main { flex:1 1 100%; order:2; }
+  .dashboard-root { gap:12px; }
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+/* Socket handlers: atualiza preços por coin id (cid) e atualiza saldo se enviado */
+(function(){
+  // Inicializa dataset com preço inicial (já presente no attribute data-price)
+  document.querySelectorAll('.coin-card').forEach(card => {
+    const raw = card.getAttribute('data-price') || "0";
+    card.dataset.price = parseFloat(raw) || 0;
+  });
+
+  const socket = io(); // assume servidor Socket.IO padrão
+  // atualizações do mercado (esperando objeto: { bitcoin: { price: 1234.56 }, ethereum: { price: 234.45 } })
+  socket.on('market_update', data => {
+    for (const cid in data) {
+      try {
+        const obj = data[cid];
+        if (!obj || typeof obj.price === 'undefined') continue;
+        const price = parseFloat(obj.price);
+        const card = document.getElementById('card-' + cid);
+        if (!card) continue;
+
+        const old = parseFloat(card.dataset.price) || 0;
+        // atualiza DOM
+        const priceEl = card.querySelector('.price');
+        if (priceEl) priceEl.textContent = price.toFixed(2);
+
+        // animação visual (up/down)
+        card.classList.remove('price-up','price-down');
+        if (price > old) {
+          card.classList.add('price-up');
+        } else if (price < old) {
+          card.classList.add('price-down');
+        }
+        // atualiza dataset
+        card.dataset.price = price;
+        // remove classes depois da animação
+        setTimeout(()=> card.classList.remove('price-up','price-down'), 1000);
+      } catch(e) { console.error('market_update error', e); }
+    }
+  });
+
+  // atualiza saldo se receber evento
+  socket.on('balance_update', data => {
+    if (data && typeof data.balance !== 'undefined') {
+      const el = document.getElementById('balance');
+      if (el) el.textContent = 'R$ ' + parseFloat(data.balance).toFixed(2);
+    }
+  });
+
+  // fallback: se socket não conectar, você ainda verá os preços iniciais renderizados pelo servidor
+})();
+</script>
+{% endblock %}

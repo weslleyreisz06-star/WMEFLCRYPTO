@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Depósito{% endblock %}
+
+{% block content %}
+<div class="deposit-container" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:80vh; background:#1E1E2F; color:#FFF; padding:50px; border-radius:20px; box-shadow:0 0 30px rgba(0,0,0,0.5);">
+    <h2 style="color:#FF5A5F; margin-bottom:20px;">Depósito via PIX</h2>
+    <p>Valor mínimo: <strong style="color:#FFD700;">R$ 22,90</strong></p>
+
+    <form method="POST" style="margin:20px 0;">
+        <input type="number" step="0.01" min="22.90" name="amount" id="amount" value="22.90" required
+               style="padding:15px; width:250px; border-radius:10px; border:none; outline:none; margin-bottom:10px; font-size:16px;">
+        <br>
+        <button type="submit" style="padding:12px 25px; background:#FF5A5F; border:none; border-radius:12px; color:#FFF; font-weight:bold; cursor:pointer; transition:0.3s; font-size:16px;">
+            Gerar QR Code
+        </button>
+    </form>
+
+    <div style="margin-top:30px; text-align:center;">
+        <h4 style="color:#FFD700;">Ou use este QR Code:</h4>
+        <div style="background:#2A2A3C; padding:15px; border-radius:15px; display:inline-block;">
+            <img src="data:image/png;base64,{{ qr_img }}" alt="QR Code PIX" style="width:260px; height:260px; border-radius:15px; box-shadow:0 0 20px #FF5A5F;">
+        </div>
+        <p style="margin-top:15px;">Chave PIX: <strong style="color:#FF5A5F;">{{ pix_key }}</strong>
+            <button onclick="copyPix()" style="padding:5px 12px; border:none; border-radius:8px; background:#FFD700; color:#1E1E2F; cursor:pointer; font-weight:bold;">Copiar</button>
+        </p>
+    </div>
+</div>
+
+<script>
+function copyPix() {
+    navigator.clipboard.writeText("{{ pix_key }}").then(() => {
+        alert("Chave PIX copiada!");
+    }).catch(err => {
+        alert("Erro ao copiar a chave PIX");
+    });
+}
+</script>
+{% endblock %}
