@@ -381,4 +381,5 @@ if __name__=="__main__":
         print("Erro ao garantir supremo admin no startup:", e)
 
     # Para Render, use host padrão e debug=False
-    socketio.run(app, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    socketio.run(app, host="0.0.0.0", port=port, debug=False, allow_unsafe_werkzeug=True)
