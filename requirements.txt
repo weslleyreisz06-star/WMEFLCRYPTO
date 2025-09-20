@@ -13,4 +13,6 @@ eventlet
 Flask-SocketIO==5.5.1
 python-dotenv==1.0.0
 eventlet==0.33.3
+psycopg2-binary==2.9.7
+
 
