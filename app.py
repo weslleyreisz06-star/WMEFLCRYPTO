@@ -380,4 +380,5 @@ if __name__=="__main__":
     except Exception as e:
         print("Erro ao garantir supremo admin no startup:", e)
 
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+    # Para Render, use host padrão e debug=False
+    socketio.run(app, debug=False)
