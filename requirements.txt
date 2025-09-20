@@ -5,6 +5,8 @@ Flask-Migrate==4.0.4
 Flask-WTF==1.1.1
 WTForms==3.0.1
 requests==2.31.0
+gunicorn
+qrcode
 Flask-SocketIO==5.5.1
 python-dotenv==1.0.0
 eventlet==0.33.3
