@@ -11,10 +11,14 @@
         <div style="background:#2A2A3C; padding:15px; border-radius:15px; display:inline-block;">
             <img src="data:image/png;base64,{{ qr_img }}" alt="QR Code PIX" style="width:260px; height:260px; border-radius:15px; box-shadow:0 0 20px #FF5A5F;">
         </div>
-        <p style="margin-top:15px;">Chave PIX: <strong style="color:#FF5A5F;">{{ pix_key }}</strong>
+        <p style="margin-top:15px;">Chave PIX: <strong id="pix-key" style="color:#FF5A5F;">{{ pix_key }}</strong>
             <button onclick="copyPix()" style="padding:5px 12px; border:none; border-radius:8px; background:#FFD700; color:#1E1E2F; cursor:pointer; font-weight:bold;">Copiar</button>
         </p>
-        <p style="margin-top:10px; font-size:14px; color:#AAA;">Payload PIX: <code style="color:#FFD700;">{{ payload }}</code></p>
+
+        <div style="margin-top:20px; background:#2A2A3C; padding:15px; border-radius:10px; max-width:500px; word-break:break-word; text-align:left;">
+            <p style="margin:0; font-size:14px; color:#AAA;">Payload PIX completo:</p>
+            <code style="color:#FFD700; font-size:13px;">{{ payload }}</code>
+        </div>
     </div>
 
     <a href="{{ url_for('dashboard') }}" style="padding:12px 25px; background:#FF5A5F; border:none; border-radius:12px; color:#FFF; font-weight:bold; text-decoration:none; transition:0.3s; cursor:pointer;">Voltar ao Dashboard</a>
@@ -22,7 +26,8 @@
 
 <script>
 function copyPix() {
-    navigator.clipboard.writeText("{{ pix_key }}").then(() => {
+    const key = document.getElementById("pix-key").innerText;
+    navigator.clipboard.writeText(key).then(() => {
         alert("Chave PIX copiada!");
     }).catch(err => {
         alert("Erro ao copiar a chave PIX");
