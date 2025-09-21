@@ -1,5 +1,5 @@
 # Escolhe a versão do Python
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
