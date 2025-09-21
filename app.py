@@ -17,6 +17,8 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
+from flask_migrate import Migrate
+migrate = Migrate(app, db)
 socketio = SocketIO(app, cors_allowed_origins="*")
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
