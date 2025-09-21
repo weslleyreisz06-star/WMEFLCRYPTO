@@ -12,4 +12,4 @@ Werkzeug
 eventlet
 Flask-SocketIO==5.5.1
 python-dotenv==1.0.0
-psycopg[binary]==3.2.10
+psycopg2-binary==2.9.9
