@@ -375,7 +375,7 @@ def wallet_withdraw():
     return redirect(url_for("profile"))
 
 # ---------- RUN ----------
-if __name__=="__main__":
+if __name__ == "__main__":
     try:
         with app.app_context():
             ensure_supreme_admin()
@@ -384,4 +384,6 @@ if __name__=="__main__":
 
     # Para Render, use host padrão e debug=False
     port = int(os.environ.get("PORT", 5000))
+    with app.app_context():
+        db.create_all()  # Cria as tabelas no PostgreSQL do Render
     socketio.run(app, host="0.0.0.0", port=port, debug=False, allow_unsafe_werkzeug=True)
