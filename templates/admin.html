@@ -1,36 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Admin{% endblock %}
+{% block title %}Painel Admin - Brutal Crypto{% endblock %}
 {% block content %}
 <div class="container">
   <div class="card">
-    <h2>Painel Admin</h2>
+    <h2 style="color:#ff3b3b; margin-bottom:15px;">Painel Admin</h2>
     <p class="small-muted">Usuários cadastrados</p>
 
-    <table class="table">
-      <thead><tr><th>id</th><th>email</th><th>nome</th><th>saldo</th><th>role</th><th>ações</th></tr></thead>
+    <table class="table" style="width:100%; border-collapse:collapse; margin-bottom:25px;">
+      <thead style="background:#1a1a1d; color:#fff;">
+        <tr>
+          <th>id</th><th>email</th><th>nome</th><th>saldo</th><th>cargo</th><th>ações</th>
+        </tr>
+      </thead>
       <tbody>
       {% for u in users %}
-        <tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
           <td>{{ u.id }}</td>
           <td>{{ u.email }}</td>
           <td>{{ u.name or '—' }}</td>
           <td>R$ {{ "%.2f"|format(u.balance) }}</td>
           <td>{{ u.role }}</td>
           <td>
+            <!-- Creditar saldo -->
             <form style="display:inline" action="{{ url_for('admin_add_balance') }}" method="post">
               <input type="hidden" name="user_id" value="{{ u.id }}">
-              <input name="amount" placeholder="R$" style="width:80px">
+              <input name="amount" placeholder="R$" style="width:80px; padding:5px; border-radius:6px;">
               <button class="btn" type="submit">Creditar</button>
             </form>
 
+            <!-- Tornar admin -->
             <form style="display:inline" action="{{ url_for('admin_grant_admin') }}" method="post">
               <input type="hidden" name="user_id" value="{{ u.id }}">
               <button class="btn" type="submit">Tornar Admin</button>
             </form>
 
+            <!-- Alterar cargo -->
             <form style="display:inline" action="{{ url_for('admin_set_role') }}" method="post">
               <input type="hidden" name="user_id" value="{{ u.id }}">
-              <select name="role" style="margin-left:6px;">
+              <select name="role" style="margin-left:6px; padding:4px; border-radius:6px;">
                 {% for r in roles %}
                   <option value="{{ r }}" {% if u.role==r %}selected{% endif %}>{{ r }}</option>
                 {% endfor %}
@@ -44,12 +51,16 @@
     </table>
 
     <hr/>
-    <h3>Transações recentes</h3>
-    <table class="table">
-      <thead><tr><th>id</th><th>user</th><th>tipo</th><th>valor</th><th>status</th><th>criado</th></tr></thead>
+    <h3 style="color:#ff3b3b; margin:20px 0;">Transações recentes</h3>
+    <table class="table" style="width:100%; border-collapse:collapse;">
+      <thead style="background:#1a1a1d; color:#fff;">
+        <tr>
+          <th>id</th><th>usuário</th><th>tipo</th><th>valor</th><th>status</th><th>criado</th>
+        </tr>
+      </thead>
       <tbody>
       {% for t in txs %}
-        <tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
           <td>{{ t.id }}</td>
           <td>{{ t.user.email if t.user else t.user_id }}</td>
           <td>{{ t.type }}</td>
@@ -63,4 +74,3 @@
   </div>
 </div>
 {% endblock %}
-

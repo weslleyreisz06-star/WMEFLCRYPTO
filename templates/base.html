@@ -1,45 +1,93 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>{% block title %}WMEFL Crypto{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Brutal Crypto{% endblock %}</title>
+  
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  
+  <!-- CSS principal -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  
+  {% block extra_head %}{% endblock %}
 </head>
-<body class="dark">
-  <header class="topbar">
-    <div class="brand">WMEFL Crypto</div>
-    <nav>
+<body>
+
+  <!-- ==========================
+       NAVBAR / TOPO
+  ========================== -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="{{ url_for('dashboard') }}">💀 Brutal Crypto</a>
+    </div>
+
+    <nav class="nav-links">
       {% if current_user.is_authenticated %}
         <a href="{{ url_for('dashboard') }}">Dashboard</a>
         <a href="{{ url_for('profile') }}">Perfil</a>
         <a href="{{ url_for('logout') }}">Sair</a>
       {% else %}
-        <a href="{{ url_for('login') }}">Entrar</a>
-        <a href="{{ url_for('register') }}">Cadastrar</a>
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Cadastro</a>
       {% endif %}
     </nav>
   </header>
 
-  <main class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="flashes">
-        {% for category, msg in messages %}
-          <li class="flash {{ category }}">{{ msg }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+  <!-- ==========================
+       CONTEÚDO PRINCIPAL
+  ========================== -->
+  <main class="content">
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="footer">
-    <small>Todos os Direitos Reservados Group WMEFL</small>
+  <!-- ==========================
+       FOOTER GLOBAL
+  ========================== -->
+  <footer class="page-footer">
+    © 2025 Brutal Crypto — Todos os direitos reservados
   </footer>
 
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <!-- ==========================
+       SCRIPTS EXTRA
+  ========================== -->
   {% block extra_scripts %}{% endblock %}
+
+  <style>
+    /* NAVBAR SIMPLES */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background-color: var(--panel);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .navbar .logo a {
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-links a {
+      margin-left: 16px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    main.content {
+      padding: 20px;
+      min-height: calc(100vh - 130px); /* considerando header + footer */
+      background: linear-gradient(180deg, #fff, #f7f7f7);
+    }
+  </style>
+
 </body>
 </html>
+

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Vender Crypto - Brutal Crypto{% endblock %}
+
+{% block content %}
+<div class="dashboard-root">
+  <div class="top-nav">
+    <a href="{{ url_for('dashboard') }}" class="btn-back">← Voltar para Dashboard</a>
+  </div>
+
+  <h2 class="page-title">Vender Criptomoedas</h2>
+
+  <div class="card crypto-card">
+    <label for="crypto-select">Selecione a moeda:</label>
+    <select id="crypto-select" class="select-input">
+      <option value="BTC">Bitcoin (BTC)</option>
+      <option value="ETH">Ethereum (ETH)</option>
+      <option value="USDT">Tether (USDT)</option>
+      <!-- Adicione mais moedas aqui -->
+    </select>
+
+    <label for="amount">Valor a vender:</label>
+    <input type="number" id="amount" class="input-field" placeholder="Digite o valor">
+
+    <button class="btn-action">Vender</button>
+  </div>
+
+  <div class="recent-transactions card">
+    <h3>Transações Recentes</h3>
+    <ul>
+      {% for tx in recent_transactions %}
+      <li>{{ tx.date }} - {{ tx.crypto }} - {{ tx.amount }} </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

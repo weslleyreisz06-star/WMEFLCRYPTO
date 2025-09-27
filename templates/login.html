@@ -1,39 +1,58 @@
 {% extends "base.html" %}
-{% block title %}Login - WMEFL{% endblock %}
+{% block title %}Login - Brutal Crypto{% endblock %}
 
 {% block content %}
 <style>
-  body { background-color: #121212; font-family: Arial, sans-serif; }
+  body { background-color: #fff; font-family: Arial, sans-serif; color:#333; }
   .auth-card {
     max-width: 400px;
     margin: 100px auto;
     padding: 40px;
-    background-color: #1e1e1e;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-    color: #fff;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    color: #333;
+    border: 2px solid #ff3b3b;
   }
-  .auth-card h1 { text-align: center; margin-bottom: 25px; font-size: 28px; }
-  .auth-card label { display: block; margin-bottom: 6px; color: #ccc; font-size: 14px; }
+  .auth-card h1 { text-align: center; margin-bottom: 25px; font-size: 28px; color:#ff3b3b; }
+  .auth-card label { display: block; margin-bottom: 6px; color: #555; font-size: 14px; }
   .auth-card input {
     width: 100%; padding: 12px 15px; margin-bottom: 20px;
-    border-radius: 8px; border: none; background-color: #2a2a2a; color: #fff;
+    border-radius: 8px; border: 1px solid #ccc; background-color: #f9f9f9; color: #333;
   }
-  .auth-card input:focus { outline: none; box-shadow: 0 0 5px #4CAF50; border: 1px solid #4CAF50; }
+  .auth-card input:focus { outline: none; border: 2px solid #ff3b3b; box-shadow: 0 0 5px rgba(255,59,59,0.5); }
   .auth-card button {
-    width: 100%; padding: 12px; background-color: #4CAF50;
+    width: 100%; padding: 12px; background-color: #ff3b3b;
     border: none; border-radius: 8px; color: #fff; font-size: 16px; cursor: pointer;
     transition: 0.3s;
   }
-  .auth-card button:hover { background-color: #45a049; }
+  .auth-card button:hover { background-color: #d13232; }
   .auth-card .text-center { text-align: center; margin-top: 15px; font-size: 14px; }
-  .auth-card .text-center a { color: #4CAF50; text-decoration: none; }
+  .auth-card .text-center a { color: #ff3b3b; text-decoration: none; font-weight:bold; }
   .auth-card .text-center a:hover { text-decoration: underline; }
   footer { text-align: center; margin-top: 50px; font-size: 12px; color: #777; }
+
+  /* 🎵 Estilo do player */
+  .music-player {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .music-player button {
+    padding: 10px 20px;
+    background: #ff3b3b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .music-player button:hover {
+    background: #d13232;
+  }
 </style>
 
 <div class="auth-card">
-  <h1>Entrar na WMEFL Crypto</h1>
+  <h1>Entrar na Brutal Crypto</h1>
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <ul style="color: red; list-style:none; padding:0;">
@@ -55,8 +74,28 @@
   <div class="text-center">
     Não tem conta? <a href="{{ url_for('register') }}">Cadastre-se</a>
   </div>
+
+  <!-- 🎵 Player -->
+  <div class="music-player">
+    <button id="playPauseBtn">▶ Play</button>
+    <audio id="bgMusic" src="{{ url_for('static', filename='goosebumps.mp3') }}"></audio>
+  </div>
 </div>
 
-<footer>Todos os Direitos Reservados Group WMEFL</footer>
-{% endblock %}
+<footer>Todos os Direitos Reservados Group Brutal</footer>
 
+<script>
+  const audio = document.getElementById("bgMusic");
+  const btn = document.getElementById("playPauseBtn");
+
+  btn.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play();
+      btn.textContent = "⏸ Pause";
+    } else {
+      audio.pause();
+      btn.textContent = "▶ Play";
+    }
+  });
+</script>
+{% endblock %}

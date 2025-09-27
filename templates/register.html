@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Cadastrar - WMEFL Crypto{% endblock %}
+{% block title %}Cadastrar - Brutal Crypto{% endblock %}
 
 {% block content %}
 <div class="auth-container">
   <div class="auth-card">
-    <h1>Cadastre-se no WMEFL Crypto</h1>
+    <h1>Cadastre-se na Brutal Crypto</h1>
     <form method="post" action="{{ url_for('register') }}">
       <label for="name">Nome</label>
       <input id="name" name="name" type="text" placeholder="Seu nome" required>
@@ -18,20 +18,20 @@
       <label for="confirm_password">Confirme a Senha</label>
       <input id="confirm_password" name="confirm_password" type="password" placeholder="Confirme a senha" required>
 
-      <button type="submit">Cadastrar</button>
+      <button type="submit" style="background:#ff3b3b; color:#fff;">Cadastrar</button>
     </form>
-    <p class="login-link">Já tem uma conta? <a href="{{ url_for('login') }}">Login</a></p>
+    <p class="login-link">Já tem uma conta? <a href="{{ url_for('login') }}" style="color:#ff3b3b;">Login</a></p>
   </div>
   <footer>
-    Todos os Direitos Reservados Group WMEFL
+    Todos os Direitos Reservados Group Brutal
   </footer>
 </div>
 
 <style>
 body {
-  background-color: #121212;
+  background-color: #fff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #fff;
+  color: #333;
 }
 
 .auth-container {
@@ -43,24 +43,23 @@ body {
 }
 
 .auth-card {
-  background: #1e1e1e;
+  background: #fff;
   padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  width: 100%;
-  max-width: 400px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  color: #333;
 }
 
 .auth-card h1 {
   text-align: center;
   margin-bottom: 30px;
-  color: #fff;
+  color: #ff3b3b;
 }
 
 .auth-card label {
   display: block;
   margin-bottom: 5px;
-  color: #ccc;
+  color: #555;
   font-weight: 500;
 }
 
@@ -68,11 +67,11 @@ body {
   width: 100%;
   padding: 10px 12px;
   margin-bottom: 20px;
-  border: 1px solid #333;
+  border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 16px;
-  background: #2a2a2a;
-  color: #fff;
+  background: #fff;
+  color: #333;
 }
 
 .auth-card input::placeholder {
@@ -82,7 +81,7 @@ body {
 .auth-card button {
   width: 100%;
   padding: 12px;
-  background: #28a745;
+  background: #ff3b3b;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -92,24 +91,25 @@ body {
 }
 
 .auth-card button:hover {
-  background: #218838;
+  background: #d13232;
 }
 
 .login-link {
   text-align: center;
   margin-top: 15px;
-  color: #aaa;
+  color: #555;
 }
 
 .login-link a {
-  color: #28a745;
+  color: #ff3b3b;
   text-decoration: none;
+  font-weight: bold;
 }
 
 footer {
   margin-top: 20px;
   text-align: center;
-  color: #666;
+  color: #777;
   font-size: 14px;
 }
 </style>

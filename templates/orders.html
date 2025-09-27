@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Ordens - Brutal Crypto{% endblock %}
+
+{% block content %}
+<div class="dashboard-root">
+  <section class="card info-card">
+    <h2>Histórico de Ordens</h2>
+    {% if orders %}
+      <ul>
+        {% for order in orders %}
+        <li>
+          {{ order.type }} de {{ order.amount }} {{ order.crypto_symbol }} - R$ {{ "%.2f"|format(order.total) }} - {{ order.status }}
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Você ainda não realizou ordens.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

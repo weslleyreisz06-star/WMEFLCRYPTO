@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Comprar Crypto - Brutal Crypto{% endblock %}
+
+{% block content %}
+<div class="dashboard-root">
+  <!-- Botão voltar -->
+  <div class="top-nav">
+    <a href="{{ url_for('dashboard') }}" class="btn-back">← Voltar para Dashboard</a>
+  </div>
+
+  <h2 class="page-title">Comprar Criptomoedas</h2>
+
+  <!-- Card central de compra -->
+  <div class="card crypto-card">
+    <label for="crypto-select">Selecione a moeda:</label>
+    <select id="crypto-select" class="select-input">
+      <option value="BTC">Bitcoin (BTC)</option>
+      <option value="ETH">Ethereum (ETH)</option>
+      <option value="USDT">Tether (USDT)</option>
+      <!-- Adicione mais moedas aqui -->
+    </select>
+
+    <label for="amount">Valor a comprar:</label>
+    <input type="number" id="amount" class="input-field" placeholder="Digite o valor">
+
+    <button class="btn-action">Comprar</button>
+  </div>
+
+  <!-- Transações recentes -->
+  <div class="recent-transactions card">
+    <h3>Transações Recentes</h3>
+    <ul>
+      {% for tx in recent_transactions %}
+      <li>{{ tx.date }} - {{ tx.crypto }} - {{ tx.amount }} </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<style>
+.dashboard-root {
+  background-color: var(--bg);
+  padding: 20px;
+  min-height: 100vh;
+  color: var(--muted);
+  font-family: 'Roboto', sans-serif;
+}
+
+.top-nav {
+  margin-bottom: 20px;
+}
+
+.btn-back {
+  background: var(--accent);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.page-title {
+  text-align: center;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.card.crypto-card, .card.recent-transactions {
+  background: var(--panel);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.crypto-card label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.select-input, .input-field {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+}
+
+.btn-action {
+  background: var(--accent);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  width: 100%;
+  cursor: pointer;
+}
+
+.btn-action:hover {
+  background: #e63232;
+}
+</style>
+{% endblock %}

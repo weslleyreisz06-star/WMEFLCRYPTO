@@ -33,7 +33,7 @@ def admin_required(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
         if not current_user.is_authenticated or not (
-            getattr(current_user, "role", None) in [3, 4]  # 3=Administrador, 4=Supremo
+            getattr(current_user, "role", None) in [3, 4]
         ):
             abort(403)
         return f(*args, **kwargs)
@@ -47,17 +47,17 @@ def ensure_supreme_admin():
         if not user:
             hashed_password = generate_password_hash("123456", method="pbkdf2:sha256", salt_length=16)
             sup_user = User(
-                name="Supremo",
+                name="Boss Magnata",
                 email=admin_email,
                 password_hash=hashed_password,
-                role=4,  # Supremo
+                role=4,
                 balance=0.0,
                 has_deposited=True
             )
             db.session.add(sup_user)
             db.session.commit()
         else:
-            user.role = 4  # Supremo
+            user.role = 4
             db.session.commit()
     except Exception as e:
         print("ensure_supreme_admin error:", e)
@@ -87,7 +87,7 @@ def login():
             flash(f"Bem-vindo {user.email}!", "success")
 
             if user.email == "cryptobrutal@gmail.com":
-                user.role = 4  # Supremo
+                user.role = 4
                 db.session.commit()
 
             return redirect(url_for("dashboard"))
@@ -156,7 +156,20 @@ def dashboard():
         for cid in coins.keys():
             prices[cid] = 0.0
 
-    return render_template("dashboard.html", user=current_user, txs=txs, coins=coins, prices=prices)
+    recent_txs = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.created_at.desc()).limit(10).all()
+    total_balance = current_user.balance
+    has_deposited = getattr(current_user,"has_deposited",False)
+
+    return render_template(
+        "dashboard.html",
+        user=current_user,
+        txs=txs,
+        recent_txs=recent_txs,
+        coins=coins,
+        prices=prices,
+        total_balance=total_balance,
+        has_deposited=has_deposited
+    )
 
 # ---------- ROTA ADMIN ----------
 @app.route("/admin")
@@ -165,8 +178,25 @@ def dashboard():
 def admin_index():
     users = User.query.order_by(User.created_at.desc()).all()
     txs = Transaction.query.order_by(Transaction.created_at.desc()).limit(50).all()
-    roles = ["Supremo", "Administrador", "Moderador Global", "Moderador de Site", "User"]
-    return render_template("admin.html", users=users, txs=txs, roles=roles)
+    roles = ["Boss Magnata", "Boss Chief", "Boss Advanced", "Boss One", "Boss Lara"]
+
+    total_users = User.query.count()
+    total_transactions = Transaction.query.count()
+    total_balance = sum([u.balance for u in users])
+    total_deposits = sum([t.amount for t in Transaction.query.filter_by(type="deposit").all()])
+    total_withdrawals = sum([t.amount for t in Transaction.query.filter_by(type="withdraw").all()])
+
+    return render_template(
+        "admin.html",
+        users=users,
+        txs=txs,
+        roles=roles,
+        total_users=total_users,
+        total_transactions=total_transactions,
+        total_balance=total_balance,
+        total_deposits=total_deposits,
+        total_withdrawals=total_withdrawals
+    )
 
 @app.route("/admin/add_balance", methods=["POST"])
 @login_required
@@ -215,7 +245,7 @@ def admin_grant_admin():
 def admin_set_role():
     user_id = request.form.get("user_id")
     role = request.form.get("role")
-    allowed_roles = ["Supremo", "Administrador", "Moderador Global", "Moderador de Site", "User"]
+    allowed_roles = ["Boss Magnata", "Boss Chief", "Boss Advanced", "Boss One", "Boss Lara"]
     if role not in allowed_roles:
         flash("Cargo inválido", "danger")
         return redirect(url_for("admin_index"))
@@ -226,11 +256,17 @@ def admin_set_role():
         return redirect(url_for("admin_index"))
 
     current_role_name = getattr(current_user, "role", None)
-    if role == "Supremo" and current_role_name != 4:
-        flash("Apenas um usuário Supremo pode atribuir o cargo Supremo.", "danger")
+    if role == "Boss Magnata" and current_role_name != 4:
+        flash("Apenas um usuário Boss Magnata pode atribuir o cargo Boss Magnata.", "danger")
         return redirect(url_for("admin_index"))
 
-    mapping = {"User":0,"Moderador de Site":1,"Moderador Global":2,"Administrador":3,"Supremo":4}
+    mapping = {
+        "Boss Lara": 0,
+        "Boss One": 1,
+        "Boss Advanced": 2,
+        "Boss Chief": 3,
+        "Boss Magnata": 4
+    }
     user.role = mapping.get(role, 0)
     db.session.commit()
     flash(f"Cargo de {user.email} alterado para {role}.", "success")
@@ -265,17 +301,13 @@ def logout():
     return redirect(url_for("login"))
 
 # ---------- DEPOSITO PIX / QR CODE ----------
-PIX_KEY = "0a02a292-39ae-4b7c-89fc-b889fb970a05"  # SUA CHAVE PIX MANTIDA
+PIX_KEY = "0a02a292-39ae-4b7c-89fc-b889fb970a05"
 
 def generate_pix_payload(amount: float):
-    """
-    Gera payload PIX funcional compatível com todos os bancos.
-    """
-    merchant_name = "WMEFL CRYPTO"
+    merchant_name = "Brutal Crypto"
     city = "SAO PAULO"
     valor_str = f"{amount:.2f}"
 
-    # Payload EMV
     payload = (
         "000201" +
         "26580014BR.GOV.BCB.PIX" +
@@ -286,11 +318,10 @@ def generate_pix_payload(amount: float):
         "5802BR" +
         f"59{len(merchant_name):02d}{merchant_name}" +
         f"60{len(city):02d}{city}" +
-        "62290525REC" +  # Additional Data
+        "62290525REC" +
         "6304"
     )
 
-    # CRC16 CCITT
     def crc16_ccitt(data: bytes, poly=0x1021, init_val=0xFFFF):
         crc = init_val
         for b in data:
@@ -320,18 +351,15 @@ def deposito():
             flash("Valor inválido","danger")
             return redirect(url_for("deposito"))
 
-        if amount < 22.90:
-            flash("O depósito mínimo é de R$22,90.","warning")
+        if amount < 37.99:
+            flash("O depósito mínimo é de R$37,99.","warning")
             return redirect(url_for("deposito"))
 
         payload = generate_pix_payload(amount)
-
-        # Salvar transação
         tx = Transaction(user_id=current_user.id, amount=amount, type="deposit", status="pending", extra="PIX aguardando pagamento")
         db.session.add(tx)
         db.session.commit()
 
-        # QR code Premium
         qr = qrcode.QRCode(box_size=10, border=4)
         qr.add_data(payload)
         qr.make(fit=True)
@@ -342,8 +370,7 @@ def deposito():
 
         return render_template("deposito_confirm.html", pix_key=PIX_KEY, qr_img=qr_img, payload=payload, amount=amount)
 
-    # GET: valor mínimo
-    payload = generate_pix_payload(22.90)
+    payload = generate_pix_payload(37.99)
     qr = qrcode.QRCode(box_size=10, border=4)
     qr.add_data(payload)
     qr.make(fit=True)
@@ -352,7 +379,108 @@ def deposito():
     img.save(buffered, format="PNG")
     qr_img = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-    return render_template("deposito.html", pix_key=PIX_KEY, qr_img=qr_img, payload=payload, amount=22.90)
+    return render_template("deposito.html", pix_key=PIX_KEY, qr_img=qr_img, payload=payload, amount=37.99)
+
+# ---------- FUNÇÃO AUXILIAR ----------
+def get_recent_transactions(limit=5):
+    """Retorna as últimas transações do usuário logado"""
+    return Transaction.query.filter_by(user_id=current_user.id)\
+                            .order_by(Transaction.id.desc())\
+                            .limit(limit).all()
+
+
+# ---------- ROTAS DE COMPRA E VENDA DE CRYPTO ----------
+@app.route("/buy_crypto", methods=["GET", "POST"])
+@login_required
+def buy_crypto():
+    if request.method == "POST":
+        data = request.get_json()
+        coin = data.get("coin")
+        try:
+            amount = float(data.get("amount", 0))
+        except ValueError:
+            amount = 0.0
+
+        if amount <= 0:
+            return jsonify({"success": False, "message": "Quantidade inválida."})
+
+        try:
+            url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin}&vs_currencies=brl"
+            price = requests.get(url, timeout=10).json().get(coin, {}).get("brl", 0.0)
+        except Exception:
+            price = 0.0
+
+        total_cost = price * amount
+        if total_cost > current_user.balance:
+            return jsonify({"success": False, "message": "Saldo insuficiente."})
+
+        current_user.balance -= total_cost
+        current_user.crypto_balance = getattr(current_user, "crypto_balance", 0) + amount
+
+        tx = Transaction(
+            user_id=current_user.id,
+            amount=total_cost,
+            type="buy",
+            status="paid",
+            extra=f"Comprou {amount} {coin} a R${price:.2f}"
+        )
+        db.session.add(tx)
+        db.session.commit()
+
+        socketio.emit("balance_update", {
+            "balance": current_user.balance,
+            "crypto_balance": current_user.crypto_balance
+        }, to=current_user.id)
+
+        return jsonify({"success": True, "message": f"Compra de {amount} {coin} realizada com sucesso!"})
+
+    recent_transactions = get_recent_transactions()
+    return render_template("buy_crypto.html", recent_transactions=recent_transactions)
+
+
+@app.route("/sell_crypto", methods=["GET", "POST"])
+@login_required
+def sell_crypto():
+    if request.method == "POST":
+        data = request.get_json()
+        coin = data.get("coin")
+        try:
+            amount = float(data.get("amount", 0))
+        except ValueError:
+            amount = 0.0
+
+        if amount <= 0 or amount > getattr(current_user, "crypto_balance", 0):
+            return jsonify({"success": False, "message": "Quantidade inválida ou saldo insuficiente."})
+
+        try:
+            url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin}&vs_currencies=brl"
+            price = requests.get(url, timeout=10).json().get(coin, {}).get("brl", 0.0)
+        except Exception:
+            price = 0.0
+
+        total_gain = price * amount
+        current_user.balance += total_gain
+        current_user.crypto_balance -= amount
+
+        tx = Transaction(
+            user_id=current_user.id,
+            amount=total_gain,
+            type="sell",
+            status="paid",
+            extra=f"Vendeu {amount} {coin} a R${price:.2f}"
+        )
+        db.session.add(tx)
+        db.session.commit()
+
+        socketio.emit("balance_update", {
+            "balance": current_user.balance,
+            "crypto_balance": current_user.crypto_balance
+        }, to=current_user.id)
+
+        return jsonify({"success": True, "message": f"Venda de {amount} {coin} realizada com sucesso!"})
+
+    recent_transactions = get_recent_transactions()
+    return render_template("sell_crypto.html", recent_transactions=recent_transactions)
 
 # ---------- SAQUE ----------
 @app.route("/wallet/withdraw", methods=["POST"])
@@ -362,9 +490,10 @@ def wallet_withdraw():
         amount=float(request.form.get("amount",0))
     except:
         amount=0
+
     if not getattr(current_user,"has_deposited",False):
-        flash("Você precisa realizar um depósito (mínimo R$22,90) antes de solicitar saque.","danger")
-        return redirect(url_for("profile"))
+        flash("Você precisa realizar um depósito (mínimo R$37,99) antes de solicitar saque.","danger")
+        return redirect(url_for("deposito"))
     if amount<=0 or amount>current_user.balance:
         flash("Valor inválido ou saldo insuficiente.","danger")
         return redirect(url_for("profile"))
@@ -382,8 +511,7 @@ if __name__ == "__main__":
     except Exception as e:
         print("Erro ao garantir supremo admin no startup:", e)
 
-    # Para Render, use host padrão e debug=False
     port = int(os.environ.get("PORT", 5000))
     with app.app_context():
-        db.create_all()  # Cria as tabelas no PostgreSQL do Render
+        db.create_all()
     socketio.run(app, host="0.0.0.0", port=port, debug=False, allow_unsafe_werkzeug=True)
